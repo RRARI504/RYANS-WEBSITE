@@ -1,5 +1,6 @@
 $(() => {
   const $page = $('#all-contents');
+  let tweetCount = 0; //init tweet count
 
   //created tweets container
   const $tweetsDiv = $('<div class="tweets"></div>');
@@ -9,10 +10,10 @@ $(() => {
   const $backButton = $('<button id="back-home-button">Back Home</button>');
   //create submit button w/ id submit tweet
   const $submit = $('<input type="submit" id="submit-tweet">Tweet here</button>');
-  //
+  //create inputs for username and message
   const $usernameInput = $('<input id="username-input" type="text" placeholder="Type username..." />')
   const $messageInput = $('<input id="message-input" type="text" placeholder="Write a tweet..." />')
-  //append to page
+  //append to all made elements to page
   $page.append($tweetsDiv, $buttonOne, $backButton, $submit, $usernameInput, $messageInput);
 
   //window.visitor = 'guest'
@@ -28,10 +29,11 @@ $(() => {
     const timeStamp = moment(tweet.created_at).format('MMMM Do YYYY, h:mm:ss a')//create timestamp w/ correct format using moment 
     const $timestamp = $(`<span class='timestamp'> (${timeStamp})</span>`)
 
+       // Create a human-readable time-ago string
     const timeMessage = moment(tweet.created_at).fromNow()
     const $timeMessage = $(`<span class='humanFriendlyTimestamp'> - ${timeMessage}</span>`)
 
-   //append to tweets div
+   //append tweet components to tweet container
     $tweet.append($user, $message, $timestamp, $timeMessage)
 
     return $tweet;
@@ -45,14 +47,19 @@ $(() => {
 
 
  function newTweets(){ //make a function new tweets that shows all tweets on home page
-  getTweets(streams.home)
+  const showNewTweet = streams.home.slice(tweetCount)
+  if(showNewTweet.length > 0){
+    getTweets(streams.home)//get tweet from home stream array
+    tweetCount = streams.home.length
+
+  }
   $backButton.hide() //hide back button on home timeline
 
   }
 
  function timeline(username){ //show tweets from a specific user
   const tweets = streams.users[username]
-  getTweets(tweets)
+  getTweets(tweets)//and show their tweets
   $backButton.show() //show the back button to return home
 
   }
@@ -69,26 +76,26 @@ $(() => {
 
   })
 
- $backButton.on('click', function(){
+ $backButton.on('click', function(){ //back button that goes back to home timeline when touched
   newTweets()
 
   })
 
- $submit.on('click', function(){ //event listener to submit new tweet
-  const message = $messageInput.val().trim()
-  const username = $usernameInput.val().trim()
+ $submit.on('click', function(){ // submit new tweet when clicked
+  const message = $messageInput.val().trim()// get tweet
+  const username = $usernameInput.val().trim()//get username
 
-  if(username && message){
+  if(username && message){//if username and message  are filled
     window.visitor = username;
-    writeTweet(message)
-
+    writeTweet(message)//add tweet
+    //clear input fields
     $usernameInput.val('')
     $messageInput.val('')
     newTweets()
   }
 
   })
-
+//load tweets on page
  newTweets(streams.home)
 
 });
