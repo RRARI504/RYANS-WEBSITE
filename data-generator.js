@@ -18,6 +18,10 @@ const users = Object.keys(streams.users);
 // Utility function for adding tweets to our data structures
 const addTweet = (newTweet) => {
   const username = newTweet.user;
+  if(!streams.users[username]){
+    streams.users[username] = []
+
+  }
   streams.users[username].push(newTweet);
   streams.home.push(newTweet);
 };
